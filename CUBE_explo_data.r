@@ -66,64 +66,49 @@ grid10 <- st_make_grid(
 
 #### ---- flow develop for one species ---- ####
 # -------------------------------------------- #
-# data selection
 
-unique(obs_sf_utm$name)
-spe <- obs_sf_utm[obs_sf_utm$name == "Catharus bicknelli", ]
-dim(spe)
+# Gifs creation for data exploration
+for (i in 1:length(unique(obs_sf_utm$name))) {
 
-plot(spe, col = "red", add = T)
+    # species selection
+        species <- unique(obs_sf_utm$name)[i]
+        print(species)
+        obs <- obs_sf_utm[obs_sf_utm$name == species, ]
+    
+    # time range selection
+        obs2 <- obs[obs$year > 1989, ] # data from 1990 to 2019 (cf Vincent Bellavance methodo)
+    
+    # Grid creation
+        g <- st_make_grid(obs2, cellsize = c(10000, 10000))
+        grid <- st_cast(g, "MULTIPOLYGON") # conversion from polygon feature to multipolygon
+        grid
 
-# data from 1990 to 2019 (cf Vincent Bellavance methodo)
-table(spe$year)
-spe <- spe[spe$year > 1989, ]
-length(unique(spe$year))
+    # function for plot creation
+        makeplot <- function() {
+            datalist <- split(obs2, obs2$year)
+            seq <- 1
 
-# grid creation
-grid10_grive <- st_make_grid(spe, cellsize = c(10000, 10000))
-g <- st_cast(grid10_grive, "MULTIPOLYGON") # conversion from polygon feature to multipolygon
+            for(j in 1:length(datalist)) {
+                
+                print(names(datalist)[j])
 
-# polygon selection containing obs
-pix <- unlist(st_intersects(spe, g))
+                all_obs <- do.call("rbind", datalist[1:seq])
+                pix <- unlist(st_intersects(all_obs, grid))
+                
+                plot(grid, border = "grey", main = paste("year", names(datalist)[j], sep = " "))
+                plot(st_geometry(grid)[pix], add = TRUE, col = "darkgreen")
 
-# vizualisation of pixels with obs
-plot(st_geometry(g)[pix])
-plot(st_geometry(spe), add = T, col = "red")
-# gif creation - 1 map per year
-spe_ls <- split(spe, spe$year)
-names(spe_ls)
-
-seq <- 1
-for (i in 1:length(spe_ls)) {
-    png(
-        paste("/home/claire/BDQC-GEOBON/data/EBVs/maps/test_grive/gif/gif_grive-",
-            names(spe_ls)[i],
-            ".png",
-            sep = ""
-        ),
-        res = 300,
-        width = 50,
-        height = 40,
-        pointsize = 20,
-        unit = "cm",
-        bg = "white"
-    )
-
-    print(names(spe_ls)[i])
-
-    g2 <- do.call("rbind", spe_ls[1:seq])
-
-    pix <- unlist(st_intersects(spe_ls[[i]], g))
+                seq <- seq + 1
+            }
 
 
-    # print(
-    plot(st_geometry(g), main = paste("year", names(spe_ls)[i], sep = " "))
-    plot(st_geometry(g2)[pix], add = TRUE, col = "darkgreen")
+        }
 
-
-    # )
-    dev.off()
-
-    seq <- seq + 1
+    # gif creation
+    save_gif(makeplot(),
+            paste("/home/claire/BDQC-GEOBON/data/EBVs/gifs/",
+                    species,
+                    ".gif",
+                    sep = ""),
+                    delay = 0.8)
 }
-# ==> à continuer
