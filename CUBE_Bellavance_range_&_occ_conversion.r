@@ -2,7 +2,7 @@ library(terra)
 library(sf)
 library(raster)
 
-#### ---- Conversion des fichiers range & occ en .tif ---- ####
+#### ---- Conversion des fichiers raster range & occ en .tif ---- ####
 # ----------------------------------------------------------- #
 # Pour utilisation du package terra
 
@@ -38,4 +38,24 @@ for (i in 1:length(folder_path)) {
             )
         }
     }
+}
+
+
+#### ---- Conversion des fichiers occurences ---- ####
+# -------------------------------------------------- #
+# Pour utilisation du package sf
+
+file_path <- list.files("/home/claire/BDQC-GEOBON/data/Bellavance_data/original_occurrences", full.names = TRUE)
+
+for (i in 55:length(file_path)) {
+    path <- file_path[i]
+    new_path <- stringr::str_replace(path, "original_", "sf_converted_")
+    sp_name <- strsplit(new_path, "/")[[1]][8]
+
+    print(paste(sp_name, " --> start", sep = ""))
+
+    file <- readRDS(path)
+    file_sf <- sf::st_as_sf(file)
+
+    saveRDS(file_sf, file.path(new_path))
 }
