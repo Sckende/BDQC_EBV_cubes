@@ -47,7 +47,7 @@ for (i in 1:length(folder_path)) {
 
 file_path <- list.files("/home/claire/BDQC-GEOBON/data/Bellavance_data/original_occurrences", full.names = TRUE)
 
-for (i in 55:length(file_path)) {
+for (i in 1:length(file_path)) {
     path <- file_path[i]
     new_path <- stringr::str_replace(path, "original_", "sf_converted_")
     sp_name <- strsplit(new_path, "/")[[1]][8]
