@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --array=1-195
 #SBATCH --account=def-dgravel
-#SBATCH -t 00:15:00
-#SBATCH --mem=1024
+#SBATCH -t 00:20:00
+#SBATCH --mem=10000
 #SBATCH --job-name=data_conversion
 #SBATCH --mail-user=juhc3201@usherbrooke.ca
 #SBATCH --mail-type=ALL
