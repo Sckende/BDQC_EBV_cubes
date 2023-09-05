@@ -43,9 +43,9 @@ print("Job is over")
 
 #### For Narval
 
-install.packages("sp", repos = "https://cloud.r-project.org/")
-install.packages("sf", repos = "https://cloud.r-project.org/")
-install.packages("stringr", repos = "https://cloud.r-project.org/")
+# install.packages("sp", repos = "https://cloud.r-project.org/")
+# install.packages("sf", repos = "https://cloud.r-project.org/")
+# install.packages("stringr", repos = "https://cloud.r-project.org/")
 
 library(sp)
 library(sf)
