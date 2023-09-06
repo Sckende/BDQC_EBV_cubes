@@ -25,23 +25,37 @@ for (i in 1:length(folder_path)) {
 
     # for(j in 1:length(file_path_long)) {
     if (length(file_path_long != 0)) {
-        for (j in c(3, 5)) {
-            print(paste("valeur de j - ", j))
+        for (j in 1:5) {
+            if (j %in% c(3, 5)) {
+                print(paste("valeur de j - ", j))
 
-            file_name <- substr(file_path_short[j], 1, nchar(file_path_short[j]) - 3)
+                file_name <- substr(file_path_short[j], 1, nchar(file_path_short[j]) - 3)
 
-            file <- raster::stack(file_path_long[j])
-            file_terra <- terra::rast(file)
+                file <- raster::stack(file_path_long[j])
+                file_terra <- terra::rast(file)
 
 
-            terra::writeRaster(
-                file_terra,
-                paste(new_folder_path, "/", file_name, "tif", sep = "")
-            )
+                terra::writeRaster(
+                    file_terra,
+                    paste(new_folder_path, "/", file_name, "tif", sep = "")
+                )
+            } else {
+                print(paste("valeur de j - ", j))
+
+                file_name <- substr(file_path_short[j], 1, nchar(file_path_short[j]) - 3)
+
+                file <- raster::stack(file_path_long[j])
+                file_terra <- terra::rast(file * 1)
+
+
+                terra::writeRaster(
+                    file_terra,
+                    paste(new_folder_path, "/", file_name, "tif", sep = "")
+                )
+            }
         }
     }
 }
-
 
 #### ---- Conversion des fichiers occurences ---- ####
 # -------------------------------------------------- #
