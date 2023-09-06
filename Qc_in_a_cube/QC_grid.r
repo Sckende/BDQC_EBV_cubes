@@ -75,3 +75,30 @@ plot(pts_small_utm)
 test <- st_intersects(pts_small, qc_grid)
 st_crs(qc_grid)
 st_crs(pts_small)
+
+#### Explo régions naturelles ####
+# ---------- #
+
+
+reg <- sf::st_read("/home/claire/BDQC-GEOBON/data/QUEBEC_regions/QUEBEC_regions_nat.gpkg")
+x11()
+plot(st_geometry(reg), border = "grey")
+plot(qc, add = T)
+reg$FID01
+
+# labeled polygons
+centre <- sf::st_centroid(reg)
+graphics::text(st_coordinates(centre), labels = centre$ID)
+
+
+
+
+
+
+
+
+
+
+sousReg <- sf::st_read("/home/claire/BDQC-GEOBON/data/QUEBEC_regions/QUEBEC_SOUSregions_nat.gpkg")
+x11()
+plot(st_geometry(sousReg))
