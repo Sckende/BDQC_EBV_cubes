@@ -76,29 +76,33 @@ test <- st_intersects(pts_small, qc_grid)
 st_crs(qc_grid)
 st_crs(pts_small)
 
-#### Explo régions naturelles ####
+
+#### Explo régions naturelles NIVEAU 1 ####
 # ---------- #
 
 
-reg <- sf::st_read("/home/claire/BDQC-GEOBON/data/QUEBEC_regions/QUEBEC_regions_nat.gpkg")
+reg1 <- sf::st_read("/home/claire/BDQC-GEOBON/data/QUEBEC_regions/QUEBEC_regions_nat.gpkg")
+names(reg1)
+reg1$ID_NIV_01
+reg1$ID_2 <- 1:length(reg1$ID_NIV_01)
 x11()
-plot(st_geometry(reg), border = "grey")
-plot(qc, add = T)
-reg$FID01
+plot(st_geometry(reg1), border = "grey")
+reg1$FID01
 
 # labeled polygons
-centre <- sf::st_centroid(reg)
-graphics::text(st_coordinates(centre), labels = centre$ID)
+centre1 <- sf::st_centroid(reg1)
+graphics::text(st_coordinates(centre1), labels = centre1$ID_2)
 
 
 
 
+#### Explo régions naturelles NIVEAU 2 ####
+# ---------- #
+reg2 <- sf::st_read("/home/claire/BDQC-GEOBON/data/QUEBEC_regions/QUEBEC_SOUSregions_nat.gpkg")
+reg2
+reg2$ID_2 <- 1:length(reg2$ID_NIV_02)
+centre2 <- sf::st_centroid(reg2)
 
-
-
-
-
-
-sousReg <- sf::st_read("/home/claire/BDQC-GEOBON/data/QUEBEC_regions/QUEBEC_SOUSregions_nat.gpkg")
 x11()
-plot(st_geometry(sousReg))
+plot(st_geometry(reg2))
+graphics::text(st_coordinates(centre2), labels = centre2$ID_2, cex = 0.8)
