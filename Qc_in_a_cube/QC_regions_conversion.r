@@ -23,7 +23,7 @@ files_short <- list.files("/home/claire/BDQC-GEOBON/data/QUEBEC_regions/CERQ_SHP
 subs <- substring(files_short, 1, 9)
 layers <- unique(subs[str_detect(subs, "CR_NIV_")])
 
-x11(); par(mfrow = c(2, 3))
+# x11(); par(mfrow = c(2, 3))
 
 for (i in seq_len(length(layers))) {
 
@@ -34,10 +34,7 @@ for (i in seq_len(length(layers))) {
     lay_sp <- sp::spTransform(lay_sp, sp::CRS("+proj=longlat +datum=WGS84 +no_defs"))
     lay_sf <- sf::st_as_sf(lay_sp)
 
-    names(lay_sf)[1:2] <- c("FID0X", "ID_NIV_0X")
-    lay_sf$CR_NIV <- name_lay
-
-    plot(st_geometry(lay_sf), border = "grey", main = name_lay)
+    # plot(st_geometry(lay_sf), border = "grey", main = name_lay)
 
          sf::st_write(lay_sf, paste("/home/claire/BDQC-GEOBON/data/QUEBEC_regions/sf_CERQ_SHP/QUEBEC_", name_lay,".gpkg", sep = ""))
   }
