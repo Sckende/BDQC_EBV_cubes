@@ -1,27 +1,43 @@
 library(sf)
 library(sp)
+library(stringr)
 
-# Regions naturelles
-reg <- rgdal::readOGR("/home/claire/BDQC-GEOBON/data/QUEBEC_regions", layer = "CR_NIV_01_S")
-reg <- sp::spTransform(reg, sp::CRS("+proj=longlat +datum=WGS84 +no_defs"))
-reg_sf <- sf::st_as_sf(reg)
+#### Provinces naturelles du Québec - CR_N01 ####
+# ==> unités territoriales de très grande superficie (10^5 km2) issue d'événements géologiques d'envergure continentale reliés à la tectonique des plaques.
 
-# Sous-régions naturelles
-sreg <- rgdal::readOGR("/home/claire/BDQC-GEOBON/data/QUEBEC_regions", layer = "CR_NIV_02_S")
-sreg <- sp::spTransform(sreg, sp::CRS("+proj=longlat +datum=WGS84 +no_defs"))
-sreg_sf <- sf::st_as_sf(sreg)
+#### Régions naturelles - CR_N02 ####
+# ==> unités territoriales de grande superficie (10^4 km2) située à l'intérieur d'une province naturelle, révélée par une configuration particulière du relief, issue de structures géologiques régionales ou d'événements quaternaires majeurs.
 
-# Visualisation
-x11()
-plot(st_geometry(sreg_sf), border = "grey")
-plot(st_geometry(reg_sf), add = T)
+#### Ensembles physiographiques - CR_N03 ####
+# ==> unités territoriales de 10^3 km2 située à l'intérieur d'une région naturelle, révélée par une configuration particulière du relief, correspondant généralement à une structure géologique ou à un événement quaternaire particulier.
 
-# sf::st_write(reg_sf, "/home/claire/BDQC-GEOBON/data/QUEBEC_regions/QUEBEC_regions_nat.gpkg")
-sf::st_write(sreg_sf, "/home/claire/BDQC-GEOBON/data/QUEBEC_regions/QUEBEC_SOUSregions_nat.gpkg")
+#### Districts écologiquues - CR_N04 ####
+# ==> unités territoriales de l'ordre de 10^2 km2 située à l'intérieur d'un ensemble physiographique, révélée par une configuration particulière du relief, correspondant généralement à une structure géologique ou à un événement quaternaire particulier.
 
-rm(list = ls())
-reg <- sf::st_read("/home/claire/BDQC-GEOBON/data/QUEBEC_regions/QUEBEC_regions_nat.gpkg")
-plot(st_geometry(reg))
+#### Ensembles topoghraphiques - CR_N05 ####
+# ==> unités territoriales de l'ordre de 10^1 km2 située à l'intérieur d'un district écologique, correspondant à un ensemble (patron d’organisation) de formes simples de relief.
 
-sousReg <- sf::st_read("/home/claire/BDQC-GEOBON/data/QUEBEC_regions/QUEBEC_SOUSregions_nat.gpkg")
-plot(st_geometry(sousReg))
+
+files_short <- list.files("/home/claire/BDQC-GEOBON/data/QUEBEC_regions/CERQ_SHP")
+
+subs <- substring(files_short, 1, 9)
+layers <- unique(subs[str_detect(subs, "CR_NIV_")])
+
+x11(); par(mfrow = c(2, 3))
+
+for (i in seq_len(length(layers))) {
+
+    name_lay <- layers[i]
+    print(name_lay)
+
+    lay_sp <- rgdal::readOGR("/home/claire/BDQC-GEOBON/data/QUEBEC_regions/CERQ_SHP", layer = paste(name_lay, "S", sep = "_"))
+    lay_sp <- sp::spTransform(lay_sp, sp::CRS("+proj=longlat +datum=WGS84 +no_defs"))
+    lay_sf <- sf::st_as_sf(lay_sp)
+
+    names(lay_sf)[1:2] <- c("FID0X", "ID_NIV_0X")
+    lay_sf$CR_NIV <- name_lay
+
+    plot(st_geometry(lay_sf), border = "grey", main = name_lay)
+
+         sf::st_write(lay_sf, paste("/home/claire/BDQC-GEOBON/data/QUEBEC_regions/sf_CERQ_SHP/QUEBEC_", name_lay,".gpkg"))
+  }
