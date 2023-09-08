@@ -39,5 +39,5 @@ for (i in seq_len(length(layers))) {
 
     plot(st_geometry(lay_sf), border = "grey", main = name_lay)
 
-         sf::st_write(lay_sf, paste("/home/claire/BDQC-GEOBON/data/QUEBEC_regions/sf_CERQ_SHP/QUEBEC_", name_lay,".gpkg"))
+         sf::st_write(lay_sf, paste("/home/claire/BDQC-GEOBON/data/QUEBEC_regions/sf_CERQ_SHP/QUEBEC_", name_lay,".gpkg", sep = ""))
   }
