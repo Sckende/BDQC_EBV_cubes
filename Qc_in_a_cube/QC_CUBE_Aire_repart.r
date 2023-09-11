@@ -1,3 +1,9 @@
+# Creation du cube EBV - aire de distribution
+# Une couche par type de modèle
+# couche 1 -> Modèles SDM type auto-corrélation spatiale de V. Bellavance avec INLA
+# couche 2 -> Modèles SDM type environnemental avec Maxent (cf pipeline GEOBON) ?
+# couche 3 -> Modèles SDM type environnemental avec MapSpecies ?
+
 library(sf)
 library(terra)
 
