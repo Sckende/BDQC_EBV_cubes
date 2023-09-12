@@ -26,15 +26,14 @@ layers <- unique(subs[str_detect(subs, "CR_NIV_")])
 # x11(); par(mfrow = c(2, 3))
 
 for (i in seq_len(length(layers))) {
-
     name_lay <- layers[i]
     print(name_lay)
 
     lay_sp <- rgdal::readOGR("/home/claire/BDQC-GEOBON/data/QUEBEC_regions/CERQ_SHP", layer = paste(name_lay, "S", sep = "_"))
-    lay_sp <- sp::spTransform(lay_sp, sp::CRS("+proj=longlat +datum=WGS84 +no_defs"))
+    # lay_sp <- sp::spTransform(lay_sp, sp::CRS("+proj=longlat +datum=WGS84 +no_defs"))
     lay_sf <- sf::st_as_sf(lay_sp)
 
     # plot(st_geometry(lay_sf), border = "grey", main = name_lay)
 
-         sf::st_write(lay_sf, paste("/home/claire/BDQC-GEOBON/data/QUEBEC_regions/sf_CERQ_SHP/QUEBEC_", name_lay,".gpkg", sep = ""))
-  }
+    sf::st_write(lay_sf, paste("/home/claire/BDQC-GEOBON/data/QUEBEC_regions/sf_CERQ_SHP/QUEBEC_", name_lay, ".gpkg", sep = ""))
+}
