@@ -52,3 +52,30 @@ matplot(t(df), type = "l")
 
 ### ===> register the result !
 # write.table(df, "/home/claire/BDQC-GEOBON/data/QC_in_a_cube/Species_distribution/QC_spe_distr_first_layer.txt", sep = "\t")
+
+
+#### Visualisation pour travail sur incertitude ####
+# ----------#
+
+files <- list.files(list_spe_long[127], full.names = TRUE)
+
+maps_025 <- rast(files[1])
+maps_975 <- rast(files[2])
+maps_occ <- rast(files[3])
+maps_pocc <- rast(files[4])
+maps_range <- rast(files[5])
+
+x11()
+par(mfrow = c(2, 3))
+
+plot(maps_range[[1]], main = "map_range")
+plot(maps_occ[[1]], main = "map_occ")
+plot(maps_pocc[[1]], main = "map_pocc")
+plot(maps_025[[1]], main = "map_025")
+plot(maps_975[[1]], main = "map_975")
+
+x11()
+par(mfrow = c(1, 3))
+plot(maps_pocc[[1]])
+plot(maps_range[[1]])
+plot(mask(resample(maps_pocc[[1]], maps_range[[1]]), maps_range[[1]]))
