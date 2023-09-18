@@ -7,74 +7,329 @@
 # 4 - niveau districts ecologiques
 # 5 - niveau pixels 10 x 10 km
 # 6 - niveau adaptable selon requête utilisateur (creation fonction)
+# au pas de temps annuel entre 1990 & 2019
+
+# *** Construction du cube ****
+# valeur de x => temps (annuel)
+# valeur de y => spatial
+
+rm(list = ls())
 
 library(sf)
 library(terra)
 
-#### Niveau xxxx ####
-# ---------- #
+# loading data part 1
+mini_occ <- st_read("/home/claire/BDQC-GEOBON/data/Bellavance_data/total_occ_pres_only_versionR.gpkg", query = "SELECT * FROM total_occ_pres_only_versionR LIMIT 100000")
 
+species <- st_read("/home/claire/BDQC-GEOBON/data/Bellavance_data/total_occ_pres_only_versionR.gpkg", query = "SELECT DISTINCT species FROM total_occ_pres_only_versionR")
+spe <- as.vector(species$species)
+
+#### Niveau 1 - niveau provinces naturelles ####
+# ---------- #
+# 20 polygones
+
+# Data loading part 2
+reg <- st_read("/home/claire/BDQC-GEOBON/data/QUEBEC_regions/sf_CERQ_SHP/QUEBEC_CR_NIV_01.gpkg")
+reg
+x11()
+plot(st_geometry(reg))
+
+# Projection conversion
+st_crs(reg) == st_crs(mini_occ)
+reg_conv <- st_transform(reg,
+    crs = st_crs(mini_occ)
+)
+
+# ----- #
+rs_N01_year <- data.frame()
+
+
+for (i in seq_len(dim(reg_conv)[1])) {
+    # for (i in 1:4) { # for testing
+
+    reg <- reg_conv$NOM_PROV_N[i]
+    wkt <- st_as_text(st_geometry(reg_conv[i, ]))
+
+    rich_spe <- NULL
+
+    for (j in 1990:2019) {
+        year <- j
+
+        occ <- st_read("/home/claire/BDQC-GEOBON/data/Bellavance_data/total_occ_pres_only_versionR.gpkg",
+            query = paste("SELECT * FROM total_occ_pres_only_versionR WHERE year_obs=", year, sep = ""),
+            wkt_filter = wkt,
+            quiet = T
+        )
+
+        rich <- length(unique(occ$species))
+
+        print(paste("------------------------> Richesse spe dans polygone ", reg, " (", i, "/", dim(reg_conv)[1], ") est de ", rich, " pour l'année ", year, ".", sep = ""))
+
+        rich_spe <- c(rich_spe, rich)
+    }
+
+    row_df <- c(reg, rich_spe)
+
+    rs_N01_year <- rbind(rs_N01_year, row_df)
+}
+names(rs_N01_year) <- c("reg_name", as.character(1990:2019))
+
+# Visualisation
+list_rs <- split(rs_N01_year, rs_N01_year$reg_name)
+x11()
+par(mfrow = c(4, 5))
+
+lapply(list_rs, function(x) {
+    nx <- t(x[, -1])
+    plot(as.numeric(nx),
+        ylim = c(0, 195),
+        xlab = "Année",
+        ylab = "Richesse spécifique",
+        axes = F,
+        main = x$reg_name,
+        bty = "n",
+        type = "h"
+    )
+    axis(1,
+        at = seq_len(length(nx)),
+        labels = 1990:2019
+    )
+    axis(2, at = seq(0, 200, 50), labels = seq(0, 200, 50))
+})
+
+# write.table(rs_N01_year,
+#             "/home/claire/BDQC-GEOBON/data/QC_in_a_cube/Richesse_spe/QC_CUBE_Richesse_spe_N01.txt", sep = "\t")
+
+#### Niveau 2 - niveau régions naturelles ####
+# ---------- #
+# 93 polygones
+
+# Data loading
 reg <- st_read("/home/claire/BDQC-GEOBON/data/QUEBEC_regions/sf_CERQ_SHP/QUEBEC_CR_NIV_02.gpkg")
 reg
-ssreg <- reg[45, ]
 x11()
 plot(st_geometry(reg))
-plot(st_geometry(ssreg), add = TRUE, border = "red")
 
-# using a bbox as a filter in st_read
-# crs total_occ.gpkg ==> +proj=lcc +lat_0=47 +lon_0=-75 +lat_1=49 +lat_2=62 +x_0=0 +y_0=0 +datum=NAD83 +units=km +no_defs
-# projection doivent etre les meme !
-
-ssreg2 <- st_transform(ssreg, crs = st_crs("+proj=lcc +lat_0=47 +lon_0=-75 +lat_1=49 +lat_2=62 +x_0=0 +y_0=0 +datum=NAD83 +units=km +no_defs"))
-
-wkt <- st_as_text(st_geometry(ssreg2))
-
-test <- st_read("/home/claire/BDQC-GEOBON/data/Bellavance_data/sf_converted_occurrences/acanthis_flammea.gpkg",
-    wkt_filter = wkt
-)
-st_read("/home/claire/BDQC-GEOBON/data/Bellavance_data/total_occ.gpkg",
-    query = "SELECT * FROM total_occ LIMIT 100"
+# Projection conversion
+st_crs(reg) == st_crs(mini_occ)
+reg_conv <- st_transform(reg,
+    crs = st_crs(mini_occ)
 )
 
-plot(st_geometry(reg))
-reg2 <- st_transform(reg, crs = st_crs("+proj=lcc +lat_0=47 +lon_0=-75 +lat_1=49 +lat_2=62 +x_0=0 +y_0=0 +datum=NAD83 +units=km +no_defs"))
-st_crs(ssreg2)
-
-library(sf)
-wkt <- "POLYGON ((-73.3 45.6, -73.3 46.6, -72.3 46.6, -72.3 45.6, -73.3 45.6))"
-species_name <- "accipiter_cooperii"
-year <- 2012
-
-occs <- st_read("/vsicurl/https://object-arbutus.cloud.computecanada.ca/bq-io/acer/oiseaux_nicheurs/oiseaux_nicheurs_occurrences.gpkg",
-    query = paste0("SELECT geom, year_obs, species FROM total_occ WHERE species='", species_name, "' AND year_obs=", year, " LIMIT 1000")
-)
-
-occs <- st_read("/home/claire/BDQC-GEOBON/data/Bellavance_data/total_occ.gpkg",
-    query = "SELECT * FROM total_occ LIMIT 100000"
-)
-
-occs_cloud <- st_read("/vsicurl/https://object-arbutus.cloud.computecanada.ca/bq-io/acer/oiseaux_nicheurs/oiseaux_nicheurs_occurrences.gpkg",
-    query = "SELECT * FROM total_occ LIMIT 100000"
-)
+# ----- #
+rs_N02_year <- data.frame()
 
 
-#### MYSTERYYYYYYYYYY ####
+for (i in seq_len(dim(reg_conv)[1])) {
+    # for (i in 1:4) { # for testing
+
+    reg <- reg_conv$NOM_REG_NA[i]
+    wkt <- st_as_text(st_geometry(reg_conv[i, ]))
+
+    rich_spe <- NULL
+
+    for (j in 1990:2019) {
+        year <- j
+
+        occ <- st_read("/home/claire/BDQC-GEOBON/data/Bellavance_data/total_occ_pres_only_versionR.gpkg",
+            query = paste("SELECT * FROM total_occ_pres_only_versionR WHERE year_obs=", year, sep = ""),
+            wkt_filter = wkt,
+            quiet = T
+        )
+
+        rich <- length(unique(occ$species))
+
+        print(paste("------------------------> Richesse spe dans polygone ", reg, " (", i, "/", dim(reg_conv)[1], ") est de ", rich, " pour l'année ", year, ".", sep = ""))
+
+        rich_spe <- c(rich_spe, rich)
+    }
+
+    row_df <- c(reg, rich_spe)
+
+    rs_N02_year <- rbind(rs_N02_year, row_df)
+}
+names(rs_N02_year) <- c("reg_name", as.character(1990:2019))
+
+# Visualization
+list_rs <- split(rs_N02_year, rs_N02_year$reg_name)
 x11()
-par(mfrow = c(1, 2))
-plot(st_geometry(occs))
-plot(st_geometry(occs_cloud), col = "grey")
+par(mfrow = c(5, 5))
 
-st_crs(occs) == st_crs(occs_cloud)
-st_crs(occs) == st_crs(reg2)
+# lapply(list_rs[1:25], function(x) {
+# lapply(list_rs[26:50], function(x) {
+# lapply(list_rs[51:75], function(x) {
+lapply(list_rs[76:93], function(x) {
+    nx <- t(x[, -1])
+    plot(as.numeric(nx),
+        ylim = c(0, 195),
+        xlab = "Année",
+        ylab = "Richesse spécifique",
+        axes = F,
+        main = x$reg_name,
+        bty = "n",
+        type = "h"
+    )
+    axis(1,
+        at = seq_len(length(nx)),
+        labels = 1990:2019
+    )
+    axis(2, at = seq(0, 200, 50), labels = seq(0, 200, 50))
+})
 
-plot(st_geometry(reg2))
-plot(st_geometry(occs), add = TRUE)
+# write.table(rs_N02_year,
+#             "/home/claire/BDQC-GEOBON/data/QC_in_a_cube/Richesse_spe/QC_CUBE_Richesse_spe_N02.txt", sep = "\t")
 
 
-reg3 <- st_transform(reg, crs = st_crs(occs))
-plot(st_geometry(reg3))
-plot(st_geometry(occs), add = TRUE)
+#### Niveau 3 - niveau physiographiques ####
+# ---------- #
+# 402 polygones
 
-testt <- st_read("/vsicurl/https://object-arbutus.cloud.computecanada.ca/bq-io/acer/oiseaux_nicheurs/oiseaux_nicheurs_occurrences.gpkg",
-    query = paste0("SELECT DISTINCT species FROM total_occ WHERE year_obs=", year)
+# Data loading
+reg <- st_read("/home/claire/BDQC-GEOBON/data/QUEBEC_regions/sf_CERQ_SHP/QUEBEC_CR_NIV_03.gpkg")
+reg
+x11()
+plot(st_geometry(reg))
+
+# Projection conversion
+st_crs(reg) == st_crs(mini_occ)
+reg_conv <- st_transform(reg,
+    crs = st_crs(mini_occ)
 )
+
+# ----- #
+rs_N03_year <- data.frame()
+
+
+for (i in seq_len(dim(reg_conv)[1])) {
+    # for (i in 1:4) { # for testing
+
+    reg <- reg_conv$NOM_ENS_PH[i]
+    wkt <- st_as_text(st_geometry(reg_conv[i, ]))
+
+    rich_spe <- NULL
+
+    for (j in 1990:2019) {
+        year <- j
+
+        occ <- st_read("/home/claire/BDQC-GEOBON/data/Bellavance_data/total_occ_pres_only_versionR.gpkg",
+            query = paste("SELECT * FROM total_occ_pres_only_versionR WHERE year_obs=", year, sep = ""),
+            wkt_filter = wkt,
+            quiet = T
+        )
+
+        rich <- length(unique(occ$species))
+
+        print(paste("------------------------> Richesse spe dans polygone ", reg, " (", i, "/", dim(reg_conv)[1], ") est de ", rich, " pour l'année ", year, ".", sep = ""))
+
+        rich_spe <- c(rich_spe, rich)
+    }
+
+    row_df <- c(reg, rich_spe)
+
+    rs_N03_year <- rbind(rs_N03_year, row_df)
+}
+names(rs_N03_year) <- c("reg_name", as.character(1990:2019))
+
+# Visualization
+
+# ----> need to a waffle plot here or color on map
+
+# write.table(rs_N03_year,
+#             "/home/claire/BDQC-GEOBON/data/QC_in_a_cube/Richesse_spe/QC_CUBE_Richesse_spe_N03.txt", sep = "\t")
+
+
+#### Niveau 4 - niveau districts écologiques ####
+# ---------- #
+# 2533 polygones
+
+# Data loading
+reg <- st_read("/home/claire/BDQC-GEOBON/data/QUEBEC_regions/sf_CERQ_SHP/QUEBEC_CR_NIV_04.gpkg")
+reg
+x11()
+plot(st_geometry(reg))
+
+# Projection conversion
+st_crs(reg) == st_crs(mini_occ)
+reg_conv <- st_transform(reg,
+    crs = st_crs(mini_occ)
+)
+
+# ----- #
+rs_N04_year <- data.frame()
+
+
+for (i in seq_len(dim(reg_conv)[1])) {
+    # for (i in 1:4) { # for testing
+
+    reg <- reg_conv$NOM_DIST_E[i]
+    wkt <- st_as_text(st_geometry(reg_conv[i, ]))
+
+    rich_spe <- NULL
+
+    for (j in 1990:2019) {
+        year <- j
+
+        occ <- st_read("/home/claire/BDQC-GEOBON/data/Bellavance_data/total_occ_pres_only_versionR.gpkg",
+            query = paste("SELECT * FROM total_occ_pres_only_versionR WHERE year_obs=", year, sep = ""),
+            wkt_filter = wkt,
+            quiet = T
+        )
+
+        rich <- length(unique(occ$species))
+
+        print(paste("------------------------> Richesse spe dans polygone ", reg, " (", i, "/", dim(reg_conv)[1], ") est de ", rich, " pour l'année ", year, ".", sep = ""))
+
+        rich_spe <- c(rich_spe, rich)
+    }
+
+    row_df <- c(reg, rich_spe)
+
+    rs_N04_year <- rbind(rs_N04_year, row_df)
+}
+names(rs_N04_year) <- c("reg_name", as.character(1990:2019))
+head(rs_N04_year)
+
+# Visualization
+
+# ----> need to a waffle plot here or color on map
+
+# write.table(rs_N04_year,
+#             "/home/claire/BDQC-GEOBON/data/QC_in_a_cube/Richesse_spe/QC_CUBE_Richesse_spe_N04.txt", sep = "\t")
+
+#### Niveau 5 & 6 - niveau pixels ####
+# ---------- #
+# xxxxxx polygones
+
+# Data loading part 2
+reg <- st_read("/home/claire/BDQC-GEOBON/data/QUEBEC_regions/sf_CERQ_SHP/QUEBEC_CR_NIV_01.gpkg")
+reg
+x11()
+plot(st_geometry(reg))
+
+# Projection conversion - **** passer les occurrences et le fond de carte en UTM ****
+# conversion des occurrences via ogr dans terminal
+# ogr2ogr -t_srs EPSG:2031 /home/claire/BDQC-GEOBON/data/Bellavance_data/total_occ_pres_only_versionR_UTM.gpkg /home/claire/BDQC-GEOBON/data/Bellavance_data/total_occ_pres_only_versionR.gpkg
+
+reg_UTM <- st_transform(reg,
+    crs = st_crs(2031)
+)
+
+occs <- st_read("/home/claire/BDQC-GEOBON/data/Bellavance_data/total_occ_pres_only_versionR_UTM.gpkg",
+    query = "SELECT * FROM total_occ_pres_only_versionR LIMIT 1000"
+)
+st_crs(reg_UTM) == st_crs(occs)
+
+# grid creation
+x11()
+plot(st_geometry(reg_UTM))
+
+cell_size <- c(10000, 10000) # en m
+
+grid <- st_make_grid(reg_UTM,
+    cellsize = cell_size,
+    square = TRUE
+)
+
+qc_grid <- st_intersection(grid, reg_UTM)
+plot(qc_grid)
+qc_grid
