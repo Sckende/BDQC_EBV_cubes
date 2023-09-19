@@ -36,7 +36,7 @@ for (j in 1990:2019) {
     rich_spe <- c(rich_spe, rich)
 }
 
-row_df <- c(reg, rich_spe)
+row_df <- c(pol, rich_spe)
 
 ll <- readRDS("./data/QC_CUBE_Richesse_spe_10x10_LIST.rds")
 ll[[i]] <- row_df
