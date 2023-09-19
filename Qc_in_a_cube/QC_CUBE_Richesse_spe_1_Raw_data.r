@@ -323,13 +323,21 @@ st_crs(reg_UTM) == st_crs(occs)
 x11()
 plot(st_geometry(reg_UTM))
 
-cell_size <- c(10000, 10000) # en m
+cell_size <- c(25000, 25000) # en m
 
 grid <- st_make_grid(reg_UTM,
     cellsize = cell_size,
     square = TRUE
 )
 
-qc_grid <- st_intersection(grid, reg_UTM)
-plot(qc_grid)
-qc_grid
+# qc_grid <- st_intersection(grid, reg_UTM)
+
+# st_write(qc_grid,
+#         "/home/claire/BDQC-GEOBON/data/QC_in_a_cube/QUEBEC_grid_10x10.gpkg")
+
+grid10 <- st_read("/home/claire/BDQC-GEOBON/data/QC_in_a_cube/QUEBEC_grid_10x10.gpkg")
+grid10$ID <- 1:dim(grid10)[1]
+# st_write(grid10,
+#         "/home/claire/BDQC-GEOBON/data/QC_in_a_cube/QUEBEC_grid_10x10.gpkg")
+
+# ==> utilisation de Narval pour obtenir une liste, un niveau de richesse spe par pixel
