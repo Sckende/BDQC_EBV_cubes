@@ -10,4 +10,4 @@
 echo $SLURM_ARRAY_TASK_ID
 
 module load StdEnv/2020 gcc/9.3.0 gdal/3.5.1 r/4.3.1
-Rscript QC_CUBE_Richesse_spe_10x10.r.r
+Rscript QC_CUBE_Richesse_spe_10x10.r
