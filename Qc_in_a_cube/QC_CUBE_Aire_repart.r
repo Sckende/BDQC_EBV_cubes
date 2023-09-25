@@ -48,10 +48,13 @@ head(df)
 class(df)
 summary(df$"2008")
 
+x11()
 matplot(t(df), type = "l")
 
 ### ===> register the result !
 # write.table(df, "/home/claire/BDQC-GEOBON/data/QC_in_a_cube/Species_distribution/QC_spe_distr_first_layer.txt", sep = "\t")
+
+# df <- read.table("/home/claire/BDQC-GEOBON/data/QC_in_a_cube/Species_distribution/QC_CUBE_Spe_distr_first_layer.txt")
 
 
 #### Visualisation pour travail sur incertitude ####
