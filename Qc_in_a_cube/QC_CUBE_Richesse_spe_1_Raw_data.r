@@ -342,36 +342,5 @@ grid10$ID <- 1:dim(grid10)[1]
 
 # ==> utilisation de Narval pour obtenir une liste, un niveau de richesse spe par pixel
 
-
-#### SCRATCH ####
-rich <- readRDS("/home/claire/BDQC-GEOBON/data/QC_in_a_cube/Richesse_spe/QC_CUBE_Richesse_spe_10x10_LIST.rds")
-
-
-test <- data.frame(
-    reg = 1:10,
-    an1 = 1:10,
-    an2 = 1:10
-)
-test
-sf::st_write(test, "/home/claire/test.gpkg")
-
-test2 <- data.frame(reg = 11, an1 = 11, an2 = 11)
-
-sf::st_write(test2, "/home/claire/test.gpkg", append = T)
-
-
-as.data.frame(c(11, 11, 11))
-data.frame(11, 11, 11)
-
-
-library(sf)
-d <- st_read("/home/claire/BDQC-GEOBON/data/QC_in_a_cube/Richesse_spe/QC_CUBE_Richesse_10x10.gpkg")
-d
-d$pix_number
-class(d)
-
-write.table(d, paste("./data/QC_CUBE_couche_", i, ".txt", sep = ""), sep="\t")
-
-
 #Concatenate 2nd lines in several files with bash
 sed -s '2!d' *.txt > test_cat2.txt
