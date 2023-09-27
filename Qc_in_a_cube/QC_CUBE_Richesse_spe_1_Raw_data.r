@@ -35,10 +35,10 @@ x11()
 plot(st_geometry(reg))
 
 # Projection conversion
-st_crs(reg) == st_crs(mini_occ)
 reg_conv <- st_transform(reg,
     crs = st_crs(mini_occ)
 )
+st_crs(reg_conv) == st_crs(mini_occ)
 
 # ----- #
 rs_N01_year <- data.frame()
@@ -68,11 +68,11 @@ for (i in seq_len(dim(reg_conv)[1])) {
         rich_spe <- c(rich_spe, rich)
     }
 
-    row_df <- c(reg, rich_spe)
+    row_df <- c(reg, wkt, rich_spe)
 
     rs_N01_year <- rbind(rs_N01_year, row_df)
 }
-names(rs_N01_year) <- c("reg_name", as.character(1990:2019))
+names(rs_N01_year) <- c("reg_name", "wkt", as.character(1990:2019))
 
 # Visualisation
 list_rs <- split(rs_N01_year, rs_N01_year$reg_name)
@@ -80,7 +80,7 @@ x11()
 par(mfrow = c(4, 5))
 
 lapply(list_rs, function(x) {
-    nx <- t(x[, -1])
+    nx <- t(x[, -c(1, 2)])
     plot(as.numeric(nx),
         ylim = c(0, 195),
         xlab = "Année",
@@ -99,6 +99,8 @@ lapply(list_rs, function(x) {
 
 # write.table(rs_N01_year,
 #             "/home/claire/BDQC-GEOBON/data/QC_in_a_cube/Richesse_spe/QC_CUBE_Richesse_spe_N01.txt", sep = "\t")
+# write.table(rs_N01_year,
+#             "/home/claire/BDQC-GEOBON/data/QC_in_a_cube/Richesse_spe/QC_CUBE_Richesse_spe_N01_wkt.txt", sep = "\t")
 
 #### Niveau 2 - niveau régions naturelles ####
 # ---------- #
@@ -111,10 +113,10 @@ x11()
 plot(st_geometry(reg))
 
 # Projection conversion
-st_crs(reg) == st_crs(mini_occ)
 reg_conv <- st_transform(reg,
     crs = st_crs(mini_occ)
 )
+st_crs(reg_conv) == st_crs(mini_occ)
 
 # ----- #
 rs_N02_year <- data.frame()
@@ -144,11 +146,11 @@ for (i in seq_len(dim(reg_conv)[1])) {
         rich_spe <- c(rich_spe, rich)
     }
 
-    row_df <- c(reg, rich_spe)
+    row_df <- c(reg, wkt, rich_spe)
 
     rs_N02_year <- rbind(rs_N02_year, row_df)
 }
-names(rs_N02_year) <- c("reg_name", as.character(1990:2019))
+names(rs_N02_year) <- c("reg_name", "wkt", as.character(1990:2019))
 
 # Visualization
 list_rs <- split(rs_N02_year, rs_N02_year$reg_name)
@@ -159,7 +161,7 @@ par(mfrow = c(5, 5))
 # lapply(list_rs[26:50], function(x) {
 # lapply(list_rs[51:75], function(x) {
 lapply(list_rs[76:93], function(x) {
-    nx <- t(x[, -1])
+    nx <- t(x[, -c(1, 2)])
     plot(as.numeric(nx),
         ylim = c(0, 195),
         xlab = "Année",
@@ -178,6 +180,8 @@ lapply(list_rs[76:93], function(x) {
 
 # write.table(rs_N02_year,
 #             "/home/claire/BDQC-GEOBON/data/QC_in_a_cube/Richesse_spe/QC_CUBE_Richesse_spe_N02.txt", sep = "\t")
+# write.table(rs_N02_year,
+#             "/home/claire/BDQC-GEOBON/data/QC_in_a_cube/Richesse_spe/QC_CUBE_Richesse_spe_N02_wkt.txt", sep = "\t")
 
 
 #### Niveau 3 - niveau physiographiques ####
@@ -191,10 +195,10 @@ x11()
 plot(st_geometry(reg))
 
 # Projection conversion
-st_crs(reg) == st_crs(mini_occ)
 reg_conv <- st_transform(reg,
     crs = st_crs(mini_occ)
 )
+st_crs(reg_conv) == st_crs(mini_occ)
 
 # ----- #
 rs_N03_year <- data.frame()
@@ -224,11 +228,11 @@ for (i in seq_len(dim(reg_conv)[1])) {
         rich_spe <- c(rich_spe, rich)
     }
 
-    row_df <- c(reg, rich_spe)
+    row_df <- c(reg, wkt, rich_spe)
 
     rs_N03_year <- rbind(rs_N03_year, row_df)
 }
-names(rs_N03_year) <- c("reg_name", as.character(1990:2019))
+names(rs_N03_year) <- c("reg_name", "wkt", as.character(1990:2019))
 
 # Visualization
 
@@ -236,7 +240,8 @@ names(rs_N03_year) <- c("reg_name", as.character(1990:2019))
 
 # write.table(rs_N03_year,
 #             "/home/claire/BDQC-GEOBON/data/QC_in_a_cube/Richesse_spe/QC_CUBE_Richesse_spe_N03.txt", sep = "\t")
-
+# write.table(rs_N03_year,
+#             "/home/claire/BDQC-GEOBON/data/QC_in_a_cube/Richesse_spe/QC_CUBE_Richesse_spe_N03_wkt.txt", sep = "\t")
 
 #### Niveau 4 - niveau districts écologiques ####
 # ---------- #
@@ -249,10 +254,10 @@ x11()
 plot(st_geometry(reg))
 
 # Projection conversion
-st_crs(reg) == st_crs(mini_occ)
 reg_conv <- st_transform(reg,
     crs = st_crs(mini_occ)
 )
+st_crs(reg_conv) == st_crs(mini_occ)
 
 # ----- #
 rs_N04_year <- data.frame()
@@ -282,11 +287,11 @@ for (i in seq_len(dim(reg_conv)[1])) {
         rich_spe <- c(rich_spe, rich)
     }
 
-    row_df <- c(reg, rich_spe)
+    row_df <- c(reg, wkt, rich_spe)
 
     rs_N04_year <- rbind(rs_N04_year, row_df)
 }
-names(rs_N04_year) <- c("reg_name", as.character(1990:2019))
+names(rs_N04_year) <- c("reg_name", "wkt", as.character(1990:2019))
 head(rs_N04_year)
 
 # Visualization
@@ -295,17 +300,21 @@ head(rs_N04_year)
 
 # write.table(rs_N04_year,
 #             "/home/claire/BDQC-GEOBON/data/QC_in_a_cube/Richesse_spe/QC_CUBE_Richesse_spe_N04.txt", sep = "\t")
+# write.table(rs_N04_year,
+#             "/home/claire/BDQC-GEOBON/data/QC_in_a_cube/Richesse_spe/QC_CUBE_Richesse_spe_N04_wkt.txt", sep = "\t")
 
 #### Niveau 5 & 6 - niveau pixels ####
 # ---------- #
 # xxxxxx polygones
 
 # Data loading part 2
-reg <- st_read("/home/claire/BDQC-GEOBON/data/QUEBEC_regions/sf_CERQ_SHP/QUEBEC_CR_NIV_01.gpkg")
-reg
+multi_reg <- st_read("/home/claire/BDQC-GEOBON/data/QUEBEC_regions/sf_CERQ_SHP/QUEBEC_CR_NIV_01.gpkg")
+multi_reg
 x11()
-plot(st_geometry(reg))
+plot(st_geometry(multi_reg))
 
+reg <- st_union(multi_reg)
+plot(st_geometry(reg))
 # Projection conversion - **** passer les occurrences et le fond de carte en UTM ****
 # conversion des occurrences via ogr dans terminal
 # ogr2ogr -t_srs EPSG:2031 /home/claire/BDQC-GEOBON/data/Bellavance_data/total_occ_pres_only_versionR_UTM.gpkg /home/claire/BDQC-GEOBON/data/Bellavance_data/total_occ_pres_only_versionR.gpkg
@@ -323,7 +332,8 @@ st_crs(reg_UTM) == st_crs(occs)
 x11()
 plot(st_geometry(reg_UTM))
 
-cell_size <- c(25000, 25000) # en m
+
+cell_size <- c(10000, 10000) # en m
 
 grid <- st_make_grid(reg_UTM,
     cellsize = cell_size,
