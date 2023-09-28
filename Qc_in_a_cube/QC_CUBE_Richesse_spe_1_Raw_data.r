@@ -342,15 +342,34 @@ grid <- st_make_grid(reg_UTM,
 
 # qc_grid <- st_intersection(grid, reg_UTM)
 
-# st_write(qc_grid,
-#         "/home/claire/BDQC-GEOBON/data/QC_in_a_cube/QUEBEC_grid_10x10.gpkg")
-
+# Ajout de ID par pixel
 grid10 <- st_read("/home/claire/BDQC-GEOBON/data/QC_in_a_cube/QUEBEC_grid_10x10.gpkg")
 grid10$ID <- 1:dim(grid10)[1]
 # st_write(grid10,
 #         "/home/claire/BDQC-GEOBON/data/QC_in_a_cube/QUEBEC_grid_10x10.gpkg")
 
-# ==> utilisation de Narval pour obtenir une liste, un niveau de richesse spe par pixel
+# ==> utilisation de Narval pour obtenir un fichier par pixel avec une time serie de RS
 
-#Concatenate 2nd lines in several files with bash
+# Puis Concatenate 2nd lines in several files with bash pour obtenir la data pour l'ensemble des pixels
 sed -s '2!d' *.txt > test_cat2.txt
+
+# Traitement du fichier de sortie de Narval
+rich <- read.table("/home/claire/BDQC-GEOBON/data/QC_in_a_cube/Richesse_spe/QC_CUBE_Richesse_spe_10x10_wkt_sortie_Narval.txt")
+dim(rich)
+head(rich)
+rich <- rich[, -1]
+names(rich) <- c("ID", "wkt", 1990:2019)
+
+# write.table(rich,
+#             "/home/claire/BDQC-GEOBON/data/QC_in_a_cube/Richesse_spe/QC_CUBE_Richesse_spe_10x10_wkt_final.txt",
+#             sep = "\t")
+
+
+
+
+
+#### Gravel yard ####
+r <- read.table("/home/claire/BDQC-GEOBON/data/QC_in_a_cube/Richesse_spe/QC_CUBE_Richesse_spe_N01_wkt.txt")
+dim(r)
+names(r)
+head(r)
